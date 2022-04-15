@@ -26,7 +26,7 @@ export default function App() {
 
   return (
     <Layout>
-      <main className="flex bg-blue-300 rounded-lg shadow-xl">
+      <main className="flex flex-col md:flex-row bg-blue-300 rounded-lg shadow-xl">
         <div className="w-72  flex flex-col justify-between p-5 bg-blue-400  rounded-lg">
           <div id="timer-label" className="text-lg text-right text-blue-200">
             {mode === "session" ? "Session" : "Break"}
@@ -42,12 +42,12 @@ export default function App() {
             setSession={setSession}
           />
         </div>
-        <div className="flex flex-col p-5 gap-2">
-          <div className="flex flex-col">
+        <div className="flex flex-col items-end md:items-center p-5 gap-2">
+          <div className="flex flex-col w-full items-center md:items-start">
             <h3 id="session-label" className="mb-2">
               Session Length
             </h3>
-            <div className="flex items-center justify-between w-32">
+            <div className="flex items-center justify-evenly w-full md:w-32 md:justify-between">
               <Button
                 id="session-decrement"
                 change={changeLength}
@@ -66,11 +66,11 @@ export default function App() {
           </div>
           <hr className="mt-2 border-blue-200" />
 
-          <div className="flex flex-col ">
+          <div className="flex flex-col w-full items-center md:items-start">
             <h3 id="break-label" className="mb-2">
               Break Length
             </h3>
-            <div className="flex items-center justify-between w-32">
+            <div className="flex items-center justify-evenly w-full md:w-32 md:justify-between">
               <Button
                 id="break-increment"
                 change={changeLength}
