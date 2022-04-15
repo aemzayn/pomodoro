@@ -1,19 +1,24 @@
-import React, { LegacyRef } from 'react'
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
-import Countdown, { zeroPad, CountdownRenderProps, CountdownApi } from "react-countdown";
+import React from "react"
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react"
+import Countdown, {
+  zeroPad,
+  CountdownRenderProps,
+  CountdownApi,
+} from "react-countdown"
 import {
   BsPlayFill as PlayIcon,
-  BsFillPauseFill as PauseIcon
-} from "react-icons/bs";
-import { MdRefresh as ResetIcon } from "react-icons/md";
+  BsFillPauseFill as PauseIcon,
+} from "react-icons/bs"
+import { MdRefresh as ResetIcon } from "react-icons/md"
 
 interface TimerProps {
   sessionLen: number
   breakLen: number
-  mode: string
+  mode: "session" | "break"
   resetSession: () => void
   setMode: Dispatch<SetStateAction<"session" | "break">>
   resetTime: () => void
+  setSession: (session: boolean) => void
 }
 
 export const Timer: React.FC<TimerProps> = ({
@@ -22,83 +27,92 @@ export const Timer: React.FC<TimerProps> = ({
   mode,
   resetSession,
   setMode,
-  resetTime
+  resetTime,
+  setSession,
 }) => {
-  const [timerState, setTimerState] = useState("stopped");
+  const [timerState, setTimerState] = useState("stopped")
   const audioRef = useRef<HTMLAudioElement>(null)
   const convertToMinute = (time: number) => {
-    return Date.now() + 1000 * 60 * time;
-  };
+    return Date.now() + 1000 * 60 * time
+  }
 
   useEffect(() => {
-    setDate(convertToMinute(sessionLen));
-  }, [sessionLen]);
+    setDate(convertToMinute(sessionLen))
+  }, [sessionLen])
 
   const countdownApi = useRef<CountdownApi | null>(null)
-  
-  const [paused, setPaused] = useState(false);
+
+  const [paused, setPaused] = useState(false)
 
   const [date, setDate] = useState(
     convertToMinute(mode === "session" ? sessionLen : breakLen)
-  );
+  )
 
   const handleTimer = () => {
     if (timerState === "stopped") {
-      handleStartClick();
-      setTimerState("running");
+      handleStartClick()
+      setTimerState("running")
     } else {
-      handlePauseClick();
-      setTimerState("stopped");
+      handlePauseClick()
+      setTimerState("stopped")
     }
-  };
+  }
 
   const handleStartClick = () => {
-    countdownApi && countdownApi.current && countdownApi.current!.start();
-    setPaused(false);
-  };
+    countdownApi && countdownApi.current && countdownApi.current!.start()
+    setPaused(false)
+  }
 
   const handlePauseClick = () => {
-    countdownApi && countdownApi.current && countdownApi.current!.pause();
-    setPaused(true);
-  };
+    countdownApi && countdownApi.current && countdownApi.current!.pause()
+    setPaused(true)
+  }
 
   const handleResetClick = () => {
-    setTimerState("stopped");
-    setDate(convertToMinute(sessionLen));
-    resetSession();
-    resetTime();
-    audioRef.current!.pause();
-    audioRef.current!.currentTime = 0;
-    setPaused(false);
-  };
+    setTimerState("stopped")
+    setDate(convertToMinute(sessionLen))
+    resetSession()
+    resetTime()
+    audioRef.current!.pause()
+    audioRef.current!.currentTime = 0
+    setPaused(false)
+  }
 
   const handleCompleted = async () => {
-    await setMode((pref: string) => (pref === "session" ? "break" : "session"));
-    audioRef.current!.play();
-    setTimeout(() => {
-      if (mode === "break") {
-        setDate(convertToMinute(breakLen));
-      } else {
-        setDate(convertToMinute(sessionLen));
-      }
+    let nextSession: "break" | "session"
+    let nextTimer: number
+    if (mode === "session") {
+      nextSession = "break"
+      nextTimer = breakLen
+      setSession(false)
+    } else {
+      nextSession = "session"
+      nextTimer = sessionLen
+      setSession(true)
+    }
 
-      countdownApi.current!.start();
-    }, 1000);
-  };
+    setMode(() => nextSession)
+
+    audioRef.current!.play()
+    audioRef.current!.onended = () => {
+      setDate(() => convertToMinute(nextTimer))
+      countdownApi.current!.start()
+    }
+  }
 
   const renderer = ({ minutes, seconds }: CountdownRenderProps) => {
     return (
       <h1 id="timer-left" className="text-8xl select-none font-thin">
         {zeroPad(minutes)}:{zeroPad(seconds)}
       </h1>
-    );
-  };
+    )
+  }
 
-    return (
-      <>
+  return (
+    <>
       <Countdown
         key={date}
-        ref={countdownApi}
+        ref={countdownApi as any}
         date={date}
         onComplete={handleCompleted}
         autoStart={false}
@@ -119,14 +133,10 @@ export const Timer: React.FC<TimerProps> = ({
         >
           <ResetIcon />
         </button>
-        <audio
-          id="beep"
-          ref={audioRef}
-          src="https://raw.githubusercontent.com/freeCodeCamp/cdn/master/build/testable-projects-fcc/audio/BeepSound.wav"
-        />
+        <audio id="beep" ref={audioRef} src="/audio/beep.wav" />
       </div>
-      </>
-    );
+    </>
+  )
 }
 
 export default Timer

@@ -7,5 +7,5 @@ export default function Layout({ children }: LayoutProps) {
     <div className="h-screen w-full flex items-center justify-center">
       {children}
     </div>
-  );
+  )
 }

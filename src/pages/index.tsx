@@ -1,23 +1,27 @@
-import { Dispatch, SetStateAction, useRef, useState } from "react";
-import { Button, Layout, Timer } from '../components'
+import { Dispatch, SetStateAction, useRef, useState } from "react"
+import { Button, Layout, Timer } from "../components"
 
 export default function App() {
-  const [breakLen, setBreakLen] = useState(5);
-  const [sessionLen, setSessionLen] = useState<number>(25);
-  const [isSession, setIsSession] = useState(true);
-  const [mode, setMode] = useState<"session" | "break" >("session");
+  const [breakLen, setBreakLen] = useState(5)
+  const [sessionLen, setSessionLen] = useState<number>(25)
+  const [isSession, setIsSession] = useState(true)
+  const [mode, setMode] = useState<"session" | "break">("session")
 
   function changeLength(num: number, fn: Dispatch<SetStateAction<number>>) {
-    fn((br: number) => (br + num < 1 || br + num >= 60 ? br : br + num));
+    fn((br: number) => (br + num < 1 || br + num >= 60 ? br : br + num))
   }
 
   function resetSession() {
-    setIsSession(true);
+    setIsSession(true)
+  }
+
+  function setSession(session: boolean) {
+    setIsSession(session)
   }
 
   function resetTime() {
-    setSessionLen(25);
-    setBreakLen(5);
+    setSessionLen(25)
+    setBreakLen(5)
   }
 
   return (
@@ -25,7 +29,7 @@ export default function App() {
       <main className="flex bg-blue-300 rounded-lg shadow-xl">
         <div className="w-72  flex flex-col justify-between p-5 bg-blue-400  rounded-lg">
           <div id="timer-label" className="text-lg text-right text-blue-200">
-            {isSession ? "Session" : "Break"}
+            {mode === "session" ? "Session" : "Break"}
           </div>
 
           <Timer
@@ -35,6 +39,7 @@ export default function App() {
             mode={mode}
             setMode={setMode}
             resetTime={resetTime}
+            setSession={setSession}
           />
         </div>
         <div className="flex flex-col p-5 gap-2">
@@ -85,5 +90,5 @@ export default function App() {
         </div>
       </main>
     </Layout>
-  );
+  )
 }
